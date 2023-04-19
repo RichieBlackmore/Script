@@ -1,0 +1,83 @@
+import json
+
+input_file_path = "C:\\Users\\lazowsm1\\PycharmProjects\\skrypt\\hboGenericHBOMAX_POLANDa.json"
+output_file_path = "C:\\Users\\lazowsm1\\PycharmProjects\\skrypt\\output.txt"
+
+with open(input_file_path, encoding="utf-8") as f:
+    data_file = json.load(f)
+
+search_terms = input("Enter search terms separated by semicolon: ").lower().split(";")
+
+with open(output_file_path, "w") as out_file:
+    for search_term in search_terms:
+        print("Searching for:", search_term)
+        title_found = False
+
+        for feature in data_file['features']:
+            title_short_movie = feature['titles'].get('pl-PL', {}).get('short', '')
+
+            if search_term == title_short_movie:
+                burned_images_links = feature['localizedImages']['pl-pl'] or feature['localizedImages']['en-us']
+
+                tileburnedin_link_16x9 = burned_images_links.get('16x9_tileburnedin')
+                tileburnedin_link_2x3 = burned_images_links.get('2x3_tileburnedin')
+                tileburnedin_link_1x1 = burned_images_links.get('1x1_tileburnedin')
+
+                original_images_links = feature['images']
+
+                original_link_16x9 = original_images_links.get('16x9')
+                original_link_2x3 = original_images_links.get('2x3')
+                original_link_1x1 = original_images_links.get('1x1')
+
+                hbomax_web_link = feature['deeplinks'].get('hbomaxWeb', '')
+
+                print(
+                    title_short_movie + "\n" + "\n" + "URL_WEB: " + hbomax_web_link + "\n" + "URL_APP: " + "play://app?packageId=com.hbo.hbonow&deeplink=" + hbomax_web_link + "\n" + "\n" + "16x9 original: " + json.dumps(
+                        original_link_16x9) + "\n" + "2x3 original: " + json.dumps(
+                        original_link_2x3) + "\n" + "1x1 original: " + json.dumps(
+                        original_link_1x1) + "\n" + "\n" + "tileburnedin_link_16x9: " + json.dumps(
+                        tileburnedin_link_16x9) + "\n" + "tileburnedin_link_2x3: " + json.dumps(
+                        tileburnedin_link_2x3) + "\n" + "tileburnedin_link_1x1: " + json.dumps(
+                        tileburnedin_link_1x1),
+                    file=out_file)
+
+                title_found = True
+
+        for seasons in data_file['seasons']:
+
+            title_short_seasons_title = seasons['titles'].get('pl-PL', {}).get('short', '').lower()
+
+            title_short_seasons_season = seasons['titles'].get('en-US', {}).get('short', '').lower()
+
+            if any(search_term in title_short_seasons_title for search_term in search_terms) or any(
+                    search_term in title_short_seasons_season for search_term in search_terms):
+                burned_images_links = seasons['localizedImages']['pl-pl'] or seasons['localizedImages']['en-us']
+
+                tileburnedin_link_16x9 = burned_images_links.get('16x9_tileburnedin')
+                tileburnedin_link_2x3 = burned_images_links.get('2x3_tileburnedin')
+                tileburnedin_link_1x1 = burned_images_links.get('1x1_tileburnedin')
+
+                original_images_links = seasons['images']
+
+                original_link_16x9 = original_images_links.get('16x9')
+                original_link_2x3 = original_images_links.get('2x3')
+                original_link_1x1 = original_images_links.get('1x1')
+
+                hbomax_web_link = seasons['deeplinks'].get('hbomaxWeb', '')
+
+                print(
+                    f"{title_short_seasons_title} {title_short_seasons_season}" + "\n" + "\n" + "URL_WEB: " + hbomax_web_link + "\n" + "URL_APP: " + "play://app?packageId=com.hbo.hbonow&deeplink=" + hbomax_web_link + "\n" + "\n" + "16x9 original: " + json.dumps(
+                        original_link_16x9) + "\n" + "2x3 original: " + json.dumps(
+                        original_link_2x3) + "\n" + "1x1 original: " + json.dumps(
+                        original_link_1x1) + "\n" + "\n" + "tileburnedin_link_16x9: " + json.dumps(
+                        tileburnedin_link_16x9) + "\n" + "tileburnedin_link_2x3: " + json.dumps(
+                        tileburnedin_link_2x3) + "\n" + "tileburnedin_link_1x1: " + json.dumps(
+                        tileburnedin_link_1x1),
+                    file=out_file)
+
+                title_found = True
+
+        if title_found:
+            print("Results are in output.txt")
+        if not title_found:
+            print("No results found for: ", search_term)
